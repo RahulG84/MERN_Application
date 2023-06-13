@@ -23,23 +23,23 @@ mongoose.connection.on("error", (err) => {
 
 app.use(express.json());
 
-// const requireLogin = (req, res, next) => {
-//   const { authorization } = req.headers;
-//   if (!authorization) {
-//     return res.status(401).json({ error: "you must be logged in" });
-//   }
-//   try {
-//     const { userId } = jwt.verify(authorization, JWT_SECRET_TOKEN);
-//     req.userExists = userId;
-//     next();
-//   } catch (err) {
-//     return res.status(401).json({ error: "you must be logged in" });
-//   }
-// };
+const requireLogin = (req, res, next) => {
+  const { authorization } = req.headers;
+  if (!authorization) {
+    return res.status(401).json({ error: "you must be logged in" });
+  }
+  try {
+    const { userId } = jwt.verify(authorization, JWT_SECRET_TOKEN);
+    req.userExists = userId;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "you must be logged in" });
+  }
+};
 
-// app.get("/test", requireLogin, (req, res) => {
-//   res.json({ message: req.userExists });
-// });
+app.get("/test", requireLogin, (req, res) => {
+  res.json({ message: req.userExists });
+});
 
 app.post("/signup", async (req, res) => {
   const { email, password, firstName } = req.body;
@@ -87,31 +87,6 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-//   const { email, password } = req.body;
-//   console.log(req.body);
-//   try {
-//     if (!email || !password) {
-//       return res.status(422).json({ error: "Please add all the fields" });
-//     }
-//     const userExists = await User.findOne({ email });
-//     if (userExists) {
-//       return res.status(422).json({ error: "User Allready Exists" });
-//     }
-//     // const hashedPassword = await bcrypt.hash(password, 12);
-
-//     await new User({
-//       email,
-//       password
-//     }).save();
-//     res.status(200).json({ message: "Signup sucess you can login now" });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
-
-// app.get("/", (req, res) => {
-//   res.json({ message: "Hello World" });
-// });
 
 if (process.env.NODE_ENV == "production") {
   const path = require("path");
